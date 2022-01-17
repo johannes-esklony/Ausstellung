@@ -5,7 +5,6 @@ class App{
     constructor() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        this.hx = "100";
         this.objects = this.load_objects();
 
 
@@ -17,30 +16,37 @@ class App{
 
     }
 
-    
+    //TODO: animate position
     app_update() {
         $("body").prepend("<p>"+"update"+"</p>");
     }
     
+
     add_canvas() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
         $("#main_view").append("<canvas id='main_canvas' width="+this.width+" height="+this.height+"></canvas>");
     }
     
+
+
     resize_canvas() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
         $("#main_canvas").attr( {width : `${this.width}`, height: `${this.width}`});
     }
     
+
+    //TODO: load all objects from img and create new class for objects
     load_objects() {    
         var ob = new Array();
     
 
         return ob;
     }
-      
+     
+    
+    //TODO: optimize for scale and array of objects
     draw_objects() {
         var drawing = new Image();
         drawing.src = "/Ausstellung/img/1.png";
@@ -51,6 +57,8 @@ class App{
     }
 };
 
+
+//function not used
 function get_dimensions()
 {
     let w = window.innerWidth;
@@ -59,7 +67,7 @@ function get_dimensions()
 }    
 
 
-
+//load all (entrypoint)
 window.onload = function(){
     this.app = new App();
 
@@ -67,6 +75,8 @@ window.onload = function(){
     //setInterval(update,1);
 }     
 
+
+//relay to change scope from window to window.app
 function update() {
     app.app_update();
 }
