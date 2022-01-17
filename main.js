@@ -12,7 +12,7 @@ var ob = new Array();
 //    autoindex_localtime off;
 //  }
 function load_objects() {
-    $.ajax({
+    /*$.ajax({
         url: "img/",
         success: function (data) {
             $(data).find("td > a").each(function () {
@@ -21,7 +21,7 @@ function load_objects() {
             });
         }
     });
-    return ob;
+    return ob;*/
 }
 
 
