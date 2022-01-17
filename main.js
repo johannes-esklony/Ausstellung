@@ -13,7 +13,7 @@ var ob = new Array();
 //  }
 function load_objects() {
     $.ajax({
-        url: "img/img/",
+        url: "img/",
         success: function (data) {
             $(data).find("td > a").each(function () {
                 // will loop through 
@@ -36,7 +36,7 @@ class App {
     constructor() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        this.objects = this.load_objects();
+        this.objects = load_objects();
 
 
 
