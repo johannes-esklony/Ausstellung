@@ -64,7 +64,7 @@ class App {
     resize_canvas() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        $("#main_canvas").attr({ width: `${this.width}`, height: `${this.width}` });
+        $("#main_canvas").attr({ width: `${this.width}`, height: `${this.height}` });
     }
 
     //TODO: optimize for scale and array of objects
