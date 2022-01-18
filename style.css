@@ -4,10 +4,10 @@
 }
 
 canvas { 
-    background: rgb(36, 31, 85); 
+    background: rgba(36, 31, 85, 0); 
     display: block; 
     margin: 0 auto; }
 
 body{
-    background-color: rgb(90, 29, 29);
+    background-color: #645c51;
 }

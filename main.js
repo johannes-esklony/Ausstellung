@@ -64,6 +64,7 @@ function update() {
     app.app_update();
 }
 
+//TODO: fix object position after scaling
 //window resize handling
 window.onresize = function () {
     app.resize_canvas();
@@ -104,7 +105,8 @@ class App_Object {
     }
     //Position is upper left corner
     setPosition(x, y) {
-
+        this.x = x;
+        this.y = y;
     }
 };
 
@@ -144,11 +146,15 @@ class App {
         this.draw_objects();
     }
 
-    //TODO: optimize for scale and array of objects
+    //TODO: optimize for scale and array of objects, fix flickering
     draw_objects() {
+        /*var bg = new Image();
+        bg.src = "room.jpg";
+        bg.onload = function () {
+            window.app.ctx.drawImage(bg, 0, 0, window.app.width, window.app.height);
+        }*/
         for (i in ob) {
             ob[i].draw();
         }
     }
 };
-
