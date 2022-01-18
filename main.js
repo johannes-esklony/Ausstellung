@@ -1,7 +1,6 @@
 
 
 
-//TODO: load all objects from img and create new class for objects
 //!nginx config file:
 //location /Ausstellung/img/ {
 //    autoindex on;
@@ -9,14 +8,23 @@
 //    autoindex_format html;
 //    autoindex_localtime off;
 //  }
-function load_objects() {
-    get_object_urls();
 
-    //TODO: size
-    //TODO: hitbox
+
+//load all (entrypoint)
+window.onload = function () {
+    //initialize app and objects (to make them global)
+    ob = new Array();
+    ob_urls = new Array();
+    app = new App();
+    //load objects
+    app.objects = load_objects();
+    //set update cycle
+    setInterval(update, 1);
 }
 
-function get_object_urls() {
+//http request requires to wait to load page and then to go on loading objects in load_objects2()
+function load_objects() {
+    //if on server
     if (window.location.href == "http://johannes-esklony.de/Ausstellung/") //TODO: change URL on deploy
     {
         $.ajax({
@@ -30,20 +38,36 @@ function get_object_urls() {
                     ob_urls.push(theText);
                     //$("body").prepend(theText);
                 }
-                for (i in ob_urls) {
-                    ob.push(new App_Object(ob_urls[i], i));
-                }
+                load_objects2();
             }
         });
     }
+    //if on local machine (due to missing(differently formatted) autoindex)
     else {
         ob_urls = ["1.png", "1.png"];
-        for (i in ob_urls) {
-            ob.push(new App_Object(ob_urls[i], i));
-        }
+        load_objects2();
     }
 }
 
+function load_objects2() {
+    //fill array
+    for (i in ob_urls) {
+        ob.push(new App_Object(ob_urls[i], i));
+    }
+    //TODO: draw objects
+    app.draw_objects();
+
+}
+
+//relay to change scope from window to window.app
+function update() {
+    app.app_update();
+}
+
+//window resize handling
+window.onresize = function () {
+    app.resize_canvas();
+}
 
 class App_Object {
     constructor(path, id) {
@@ -57,13 +81,15 @@ class App_Object {
             this.path,
             function (height) { window.ob[id].height = height; }
         );
-
+        this.x = Math.floor(Math.random() * window.app.width);
+        this.y = Math.floor(Math.random() * window.app.height);
+        this.img = new Image();
+        this.img.src = path;
     }
     getHeight(url, callback) {
         var img = new Image();
         img.src = url;
         img.onload = function () { callback(this.height); }
-        //img.onload = function() { callback(this.height); }
     }
     getWidth(url, callback) {
         var img = new Image();
@@ -71,6 +97,12 @@ class App_Object {
         img.onload = function () { callback(this.width); }
     }
 
+    draw() {
+        //window.app.ctx.drawImage(img,x,y);
+        this.img.onload = function () {
+            window.app.ctx.drawImage(img, x, y, 50, 50);
+        }
+    }
     //Position is upper left corner
     setPosition(x, y) {
 
@@ -82,15 +114,12 @@ class App {
     constructor() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        this.objects = load_objects();
 
 
 
         this.add_canvas();
-        var canvas = document.getElementById("main_canvas");
-        this.ctx = canvas.getContext("2d");
-
-        //TODO: draw objects
+        this.canvas = document.getElementById("main_canvas");
+        this.ctx = this.canvas.getContext("2d");
 
     }
 
@@ -113,47 +142,19 @@ class App {
         this.width = window.innerWidth;
         $("#main_canvas").attr({ width: `${this.width}`, height: `${this.height}` });
     }
+    //----------------------------------------------------------------------------------------------------------------//needs window.app (use in app.onload)
 
     //TODO: optimize for scale and array of objects
     draw_objects() {
+        for (i in ob) {
+            ob[i].draw();
+        }
         var drawing = new Image();
-        drawing.src = "/Ausstellung/img/1.png";
+        drawing.src = "img/1.png";
         drawing.onload = function () {
-            ctx.drawImage(drawing, 0, 0);
+            window.app.ctx.drawImage(drawing, 0, 110, 50, 50);
         }
 
     }
 };
 
-
-//function not used
-function get_dimensions() {
-    let w = window.innerWidth;
-    let h = window.innerHeight;
-    return { w, h };
-}
-
-
-//load all (entrypoint)
-window.onload = function () {
-    this.app = new App();
-
-    //set update cycle
-    setInterval(update, 1);
-}
-
-
-//relay to change scope from window to window.app
-function update() {
-    app.app_update();
-}
-
-//window resize handling
-window.onresize = function () {
-    app.resize_canvas();
-}
-
-//initialize app and objects (to make them global)
-var app;
-var ob = new Array();
-var ob_urls = new Array();
