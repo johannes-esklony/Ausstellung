@@ -1,6 +1,4 @@
 
-var app;
-var ob = new Array();
 
 
 //TODO: load all objects from img and create new class for objects
@@ -11,25 +9,69 @@ var ob = new Array();
 //    autoindex_format html;
 //    autoindex_localtime off;
 //  }
-function load_objects() {
-    ob = $.ajax({
-        url: "img/",
-        dataType: 'text',
-        success: function(data) {
-             var elements = $("<pre>").html(data)[0].getElementsByTagName("a");
-             for(var i = 0; i < elements.length; i++) {
-                  var theText = elements[i].firstChild.nodeValue;
-                  // Do something here
-                  $("body").prepend(theText);
-             }
-        }
-   });
-    return ob;
+function load_objects(){
+    let ob_urls_ = get_object_urls();
+    for (i in ob_urls_){
+        ob.push(new App_Object(ob_urls_[i], i));
+    }
+    //TODO: size
+    //TODO: hitbox
+}
+
+function get_object_urls() {
+    var ob_urls = new Array();
+    if(window.location.href == "http://johannes-esklony.de/Ausstellung/") //TODO: change URL on deploy
+    {
+        $.ajax({
+            url: "img/",
+            dataType: 'text',
+            success: function(data) {
+                 var elements = $("<pre>").html(data)[0].getElementsByTagName("a");
+                 for(var i = 0; i < elements.length; i++) {
+                      var theText = elements[i].firstChild.nodeValue;
+                      // Do something here
+                      ob_urls.append(theText);
+                      $("body").prepend(theText);
+                 }
+            }
+       });
+    }
+    else{
+        ob_urls = ["1.png", "1.png"];
+    }
+
+    return ob_urls;
 }
 
 
 class App_Object {
-    constructor(path) {
+    constructor(path, id) {
+        this.id = id;
+        this.path = "img/"+path;
+        this.width = this.getWidth(
+            this.path,
+            function(width) { window.ob[id].width = width;}
+          );
+        this.height = this.getHeight(
+            this.path,
+            function(height) { window.ob[id].height = height;}
+          );
+
+    }
+    getHeight(url, callback){
+        var img = new Image();
+        img.src = url;
+        img.onload = function() { callback(this.height); }
+        //img.onload = function() { callback(this.height); }
+    }
+    getWidth(url, callback) {
+        var img = new Image();
+        img.src = url;
+        img.onload = function() { callback(this.width); }
+    }
+
+    //Position is upper left corner
+    setPosition(x,y){
 
     }
 };
@@ -52,7 +94,7 @@ class App {
 
     //TODO: animate position
     app_update() {
-        $("body").prepend("<p>" + "update" + "</p>");
+        //$("body").prepend("<p>" + "update" + "</p>");
     }
 
 
@@ -95,7 +137,7 @@ window.onload = function () {
     this.app = new App();
 
     //set update cycle
-    //setInterval(update,1);
+    setInterval(update,1);
 }
 
 
@@ -108,3 +150,5 @@ window.onresize = function () {
     app.resize_canvas();
 }
 
+var app;
+var ob = new Array();
