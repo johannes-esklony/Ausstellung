@@ -9,34 +9,38 @@
 //    autoindex_format html;
 //    autoindex_localtime off;
 //  }
-function load_objects(){
-    let ob_urls_ = get_object_urls();
-    for (i in ob_urls_){
-        ob.push(new App_Object(ob_urls_[i], i));
-    }
+function load_objects() {
+    get_object_urls();
+
     //TODO: size
     //TODO: hitbox
 }
 
 function get_object_urls() {
-    if(window.location.href == "http://johannes-esklony.de/Ausstellung/") //TODO: change URL on deploy
+    if (window.location.href == "http://johannes-esklony.de/Ausstellung/") //TODO: change URL on deploy
     {
         $.ajax({
             url: "img/",
             dataType: 'text',
-            success: function(data) {
-                 var elements = $("<pre>").html(data)[0].getElementsByTagName("a");
-                 for(var i = 0; i < elements.length; i++) {
-                      var theText = elements[i].firstChild.nodeValue;
-                      // Do something here
-                      ob_urls.push(theText);
-                      //$("body").prepend(theText);
-                 }
+            success: function (data) {
+                var elements = $("<pre>").html(data)[0].getElementsByTagName("a");
+                for (var i = 0; i < elements.length; i++) {
+                    var theText = elements[i].firstChild.nodeValue;
+                    // Do something here
+                    ob_urls.push(theText);
+                    //$("body").prepend(theText);
+                }
+                for (i in ob_urls) {
+                    ob.push(new App_Object(ob_urls[i], i));
+                }
             }
-       });
+        });
     }
-    else{
+    else {
         ob_urls = ["1.png", "1.png"];
+        for (i in ob_urls) {
+            ob.push(new App_Object(ob_urls[i], i));
+        }
     }
 }
 
@@ -44,31 +48,31 @@ function get_object_urls() {
 class App_Object {
     constructor(path, id) {
         this.id = id;
-        this.path = "img/"+path;
+        this.path = "img/" + path;
         this.width = this.getWidth(
             this.path,
-            function(width) { window.ob[id].width = width;}
-          );
+            function (width) { window.ob[id].width = width; }
+        );
         this.height = this.getHeight(
             this.path,
-            function(height) { window.ob[id].height = height;}
-          );
+            function (height) { window.ob[id].height = height; }
+        );
 
     }
-    getHeight(url, callback){
+    getHeight(url, callback) {
         var img = new Image();
         img.src = url;
-        img.onload = function() { callback(this.height); }
+        img.onload = function () { callback(this.height); }
         //img.onload = function() { callback(this.height); }
     }
     getWidth(url, callback) {
         var img = new Image();
         img.src = url;
-        img.onload = function() { callback(this.width); }
+        img.onload = function () { callback(this.width); }
     }
 
     //Position is upper left corner
-    setPosition(x,y){
+    setPosition(x, y) {
 
     }
 };
@@ -85,7 +89,7 @@ class App {
         this.add_canvas();
         var canvas = document.getElementById("main_canvas");
         this.ctx = canvas.getContext("2d");
-        
+
         //TODO: draw objects
 
     }
@@ -135,7 +139,7 @@ window.onload = function () {
     this.app = new App();
 
     //set update cycle
-    setInterval(update,1);
+    setInterval(update, 1);
 }
 
 
