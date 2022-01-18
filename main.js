@@ -24,7 +24,7 @@ function get_object_urls() {
             dataType: 'text',
             success: function (data) {
                 var elements = $("<pre>").html(data)[0].getElementsByTagName("a");
-                for (var i = 0; i < elements.length; i++) {
+                for (var i = 1; i < elements.length; i++) {
                     var theText = elements[i].firstChild.nodeValue;
                     // Do something here
                     ob_urls.push(theText);
