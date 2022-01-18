@@ -19,7 +19,6 @@ function load_objects(){
 }
 
 function get_object_urls() {
-    var ob_urls = new Array();
     if(window.location.href == "http://johannes-esklony.de/Ausstellung/") //TODO: change URL on deploy
     {
         $.ajax({
@@ -39,8 +38,6 @@ function get_object_urls() {
     else{
         ob_urls = ["1.png", "1.png"];
     }
-
-    return ob_urls;
 }
 
 
@@ -155,3 +152,4 @@ window.onresize = function () {
 //initialize app and objects (to make them global)
 var app;
 var ob = new Array();
+var ob_urls = new Array();
