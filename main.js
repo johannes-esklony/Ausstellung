@@ -16,7 +16,7 @@ function load_objects() {
         url: "img/",
         dataType: 'text',
         success: function(data) {
-             var elements = $("<pre>").html(data)[0].getElementsByTagName("ul")[0].getElementsByTagName("li");
+             var elements = $("<pre>").html(data)[0].getElementsByTagName("a");
              for(var i = 0; i < elements.length; i++) {
                   var theText = elements[i].firstChild.nodeValue;
                   // Do something here
@@ -28,7 +28,7 @@ function load_objects() {
 }
 
 
-class Object {
+class App_Object {
     constructor(path) {
 
     }
