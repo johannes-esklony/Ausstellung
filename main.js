@@ -1,11 +1,45 @@
 
 var app;
+var ob = new Array();
 
-class App{
+
+//TODO: load all objects from img and create new class for objects
+//!nginx config file:
+//location /Ausstellung/img/ {
+//    autoindex on;
+//    autoindex_exact_size off;
+//    autoindex_format html;
+//    autoindex_localtime off;
+//  }
+function load_objects() {
+    ob = $.ajax({
+        url: "img/",
+        dataType: 'text',
+        success: function(data) {
+             var elements = $("<pre>").html(data)[0].getElementsByTagName("ul")[0].getElementsByTagName("li");
+             for(var i = 0; i < elements.length; i++) {
+                  var theText = elements[i].firstChild.nodeValue;
+                  // Do something here
+                  print(theText);
+             }
+        }
+   });
+    return ob;
+}
+
+
+class Object {
+    constructor(path) {
+
+    }
+};
+
+
+class App {
     constructor() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        this.objects = this.load_objects();
+        this.objects = load_objects();
 
 
 
@@ -18,62 +52,51 @@ class App{
 
     //TODO: animate position
     app_update() {
-        $("body").prepend("<p>"+"update"+"</p>");
+        $("body").prepend("<p>" + "update" + "</p>");
     }
-    
+
 
     add_canvas() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        $("#main_view").append("<canvas id='main_canvas' width="+this.width+" height="+this.height+"></canvas>");
+        $("#main_view").append("<canvas id='main_canvas' width=" + this.width + " height=" + this.height + "></canvas>");
     }
-    
+
 
 
     resize_canvas() {
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        $("#main_canvas").attr( {width : `${this.width}`, height: `${this.width}`});
+        $("#main_canvas").attr({ width: `${this.width}`, height: `${this.height}` });
     }
-    
 
-    //TODO: load all objects from img and create new class for objects
-    load_objects() {    
-        var ob = new Array();
-    
-
-        return ob;
-    }
-     
-    
     //TODO: optimize for scale and array of objects
     draw_objects() {
         var drawing = new Image();
         drawing.src = "/Ausstellung/img/1.png";
-        drawing.onload = function() {
-            ctx.drawImage(drawing,0,0);
-         }
-         
+        drawing.onload = function () {
+            ctx.drawImage(drawing, 0, 0);
+        }
+
     }
 };
 
 
 //function not used
-function get_dimensions()
-{
+function get_dimensions() {
     let w = window.innerWidth;
     let h = window.innerHeight;
-    return {w, h};
-}    
+    return { w, h };
+}
 
 
 //load all (entrypoint)
-window.onload = function(){
+window.onload = function () {
     this.app = new App();
 
     //set update cycle
     //setInterval(update,1);
-}     
+}
 
 
 //relay to change scope from window to window.app
@@ -81,7 +104,7 @@ function update() {
     app.app_update();
 }
 
-window.onresize = function(){
-    this.app.resize_canvas();
-}    
+window.onresize = function () {
+    app.resize_canvas();
+}
 
