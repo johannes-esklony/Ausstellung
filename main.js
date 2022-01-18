@@ -12,16 +12,19 @@ var ob = new Array();
 //    autoindex_localtime off;
 //  }
 function load_objects() {
-    /*$.ajax({
+    ob = $.ajax({
         url: "img/",
-        success: function (data) {
-            $(data).find("td > a").each(function () {
-                // will loop through 
-                alert("Found a file: " + $(this).attr("href"));
-            });
+        dataType: 'text',
+        success: function(data) {
+             var elements = $("<pre>").html(data)[0].getElementsByTagName("ul")[0].getElementsByTagName("li");
+             for(var i = 0; i < elements.length; i++) {
+                  var theText = elements[i].firstChild.nodeValue;
+                  // Do something here
+                  print(theText);
+             }
         }
-    });
-    return ob;*/
+   });
+    return ob;
 }
 
 
@@ -102,6 +105,6 @@ function update() {
 }
 
 window.onresize = function () {
-    this.app.resize_canvas();
+    app.resize_canvas();
 }
 
