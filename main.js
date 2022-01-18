@@ -30,8 +30,8 @@ function get_object_urls() {
                  for(var i = 0; i < elements.length; i++) {
                       var theText = elements[i].firstChild.nodeValue;
                       // Do something here
-                      ob_urls.append(theText);
-                      $("body").prepend(theText);
+                      ob_urls.push(theText);
+                      //$("body").prepend(theText);
                  }
             }
        });
@@ -88,7 +88,8 @@ class App {
         this.add_canvas();
         var canvas = document.getElementById("main_canvas");
         this.ctx = canvas.getContext("2d");
-
+        
+        //TODO: draw objects
 
     }
 
@@ -146,9 +147,11 @@ function update() {
     app.app_update();
 }
 
+//window resize handling
 window.onresize = function () {
     app.resize_canvas();
 }
 
+//initialize app and objects (to make them global)
 var app;
 var ob = new Array();
