@@ -20,7 +20,7 @@ function load_objects() {
              for(var i = 0; i < elements.length; i++) {
                   var theText = elements[i].firstChild.nodeValue;
                   // Do something here
-                  print(theText);
+                  $("body").prepend(theText);
              }
         }
    });
