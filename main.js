@@ -84,7 +84,8 @@ class App_Object {
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
         this.img = new Image();
-        this.img.src = path;
+        this.img.src = this.path;
+
     }
     getHeight(url, callback) {
         var img = new Image();
@@ -99,9 +100,7 @@ class App_Object {
 
     draw() {
         //window.app.ctx.drawImage(img,x,y);
-        this.img.onload = function () {
-            window.app.ctx.drawImage(img, x, y, 50, 50);
-        }
+        window.app.ctx.drawImage(this.img, this.x, this.y, 50, 50);
     }
     //Position is upper left corner
     setPosition(x, y) {
@@ -123,11 +122,6 @@ class App {
 
     }
 
-    //TODO: animate position
-    app_update() {
-        //$("body").prepend("<p>" + "update" + "</p>");
-    }
-
 
     add_canvas() {
         this.height = window.innerHeight;
@@ -144,17 +138,17 @@ class App {
     }
     //----------------------------------------------------------------------------------------------------------------//needs window.app (use in app.onload)
 
+    //TODO: animate position
+    app_update() {
+        //$("body").prepend("<p>" + "update" + "</p>");
+        this.draw_objects();
+    }
+
     //TODO: optimize for scale and array of objects
     draw_objects() {
         for (i in ob) {
             ob[i].draw();
         }
-        var drawing = new Image();
-        drawing.src = "img/1.png";
-        drawing.onload = function () {
-            window.app.ctx.drawImage(drawing, 0, 110, 50, 50);
-        }
-
     }
 };
 
