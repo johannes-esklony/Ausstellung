@@ -44,7 +44,7 @@ function load_objects() {
     }
     //if on local machine (due to missing(differently formatted) autoindex)
     else {
-        ob_urls = ["1.png", "1.png"];
+        ob_urls = ["1.png"];
         load_objects2();
     }
 }
