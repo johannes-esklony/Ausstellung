@@ -19,7 +19,7 @@ window.onload = function () {
     //load objects
     app.objects = load_objects();
     //set update cycle
-    setInterval(update, 1);
+    //setInterval(update, 1);
 }
 
 //http request requires to wait to load page and then to go on loading objects in load_objects2()
@@ -54,9 +54,7 @@ function load_objects2() {
     for (i in ob_urls) {
         ob.push(new App_Object(ob_urls[i], i));
     }
-    //TODO: draw objects
     app.draw_objects();
-
 }
 
 //relay to change scope from window to window.app
@@ -68,12 +66,15 @@ function update() {
 //window resize handling
 window.onresize = function () {
     app.resize_canvas();
+    app.draw_objects();
 }
 
 class App_Object {
     constructor(path, id) {
         this.id = id;
         this.path = "img/" + path;
+        this.img = new Image();
+        this.img.src = this.path;
         this.width = this.getWidth(
             this.path,
             function (width) { window.ob[id].width = width; }
@@ -84,8 +85,6 @@ class App_Object {
         );
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
-        this.img = new Image();
-        this.img.src = this.path;
 
     }
     getHeight(url, callback) {
@@ -100,8 +99,13 @@ class App_Object {
     }
 
     draw() {
-        //window.app.ctx.drawImage(img,x,y);
-        window.app.ctx.drawImage(this.img, this.x, this.y, 50, 50);
+            window.app.ctx.drawImage(this.img, this.x, this.y, 50, 50);
+        
+            //create var in order to access it from onload function
+            var img_ = this.img;
+            var x_ = this.x;
+            var y_ = this.y;
+            this.img.onload = function () { window.app.ctx.drawImage(img_, x_, y_, 50, 50); }
     }
     //Position is upper left corner
     setPosition(x, y) {
@@ -148,13 +152,14 @@ class App {
 
     //TODO: optimize for scale and array of objects, fix flickering
     draw_objects() {
-        /*var bg = new Image();
+        var bg = new Image();
         bg.src = "room.jpg";
         bg.onload = function () {
             window.app.ctx.drawImage(bg, 0, 0, window.app.width, window.app.height);
-        }*/
-        for (i in ob) {
-            ob[i].draw();
+            for (i in ob) {
+                window.ob[i].draw();
+            }
         }
+
     }
 };
