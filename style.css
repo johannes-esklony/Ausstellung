@@ -10,4 +10,5 @@ canvas {
 
 body{
     background-color: #645c51;
+    overscroll-behavior: contain;
 }
