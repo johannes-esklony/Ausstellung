@@ -117,8 +117,8 @@ class App_Object {
 
 class App {
     constructor() {
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
+        this.height = window.outerHeight;
+        this.width = window.outerWidth;
 
 
 
@@ -130,16 +130,16 @@ class App {
 
 
     add_canvas() {
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
+        this.height = window.outerHeight;
+        this.width = window.outerWidth;
         $("#main_view").append("<canvas id='main_canvas' width=" + this.width + " height=" + this.height + "></canvas>");
     }
 
 
 
     resize_canvas() {
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
+        this.height = window.outerHeight;
+        this.width = window.outerWidth;
         $("#main_canvas").attr({ width: `${this.width}`, height: `${this.height}` });
     }
     //----------------------------------------------------------------------------------------------------------------//needs window.app (use in app.onload)
