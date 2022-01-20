@@ -5,6 +5,13 @@ window.addEventListener("wheel", e=>{
     if(e.ctrlKey)
       e.preventDefault();//prevent zoom
   });
+
+window.addEventListener("touchstart", touchHandler, false);
+function touchHandler(event) {
+    if(event.touches.lenght > 1){
+        event.preventDefault();
+    }
+}
 //!nginx config file:
 //location /Ausstellung/img/ {
 //    autoindex on;
