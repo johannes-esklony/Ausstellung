@@ -95,7 +95,7 @@ class App_Object {
 
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
-        
+
         this.scaledStandardWidth = 50;
         this.scaledStandardHeight = 50;
     }
@@ -156,14 +156,14 @@ class App {
 
     //TODO: animate position
     app_update() {
-        
-        update_screen=true;
+
+        update_screen = true;
     }
 };
 
 
 
-(function() {
+(function () {
     document.onmousemove = handleMouseMove;
     function handleMouseMove(event) {
         var eventDoc, doc, body;
@@ -179,11 +179,11 @@ class App {
             body = eventDoc.body;
 
             event.pageX = event.clientX +
-              (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
-              (doc && doc.clientLeft || body && body.clientLeft || 0);
+                (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+                (doc && doc.clientLeft || body && body.clientLeft || 0);
             event.pageY = event.clientY +
-              (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
-              (doc && doc.clientTop  || body && body.clientTop  || 0 );
+                (doc && doc.scrollTop || body && body.scrollTop || 0) -
+                (doc && doc.clientTop || body && body.clientTop || 0);
         }
 
         // Use event.pageX / event.pageY here
@@ -194,16 +194,20 @@ class App {
 
 
 
-(function() {
+(function () {
     document.onclick = handleClick;
     function handleClick(event) {
-        var x,y;
+        var x, y;
         x = mouseX;
         y = mouseY;
         //check for object
-        for (i in ob){
-            if(x > ob[i].x && x < ob[i].x + ob[i].scaledStandardWidth && y > ob[i].y && y < ob[i].y + ob[i].scaledStandardHeight){
-                document.location = document.location.href.slice(0,-10) + ob[i].path;
+        for (i in ob) {
+            if (x > ob[i].x && x < ob[i].x + ob[i].scaledStandardWidth && y > ob[i].y && y < ob[i].y + ob[i].scaledStandardHeight) {
+                var p = document.location.href;
+                while (p.slice(-1) != "/") {
+                    p = p.slice(0,-1);
+                }
+                document.location = p + ob[i].path;
             }
         }
     }
@@ -212,19 +216,19 @@ class App {
 function renderFunction() {
     if (update_screen) {
         update_screen = false;
-            window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
-            for (i in ob) {
-                window.ob[i].draw();
-            }        
+        window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
+        for (i in ob) {
+            window.ob[i].draw();
+        }
     }
     requestAnimationFrame(renderFunction);
 }
 function renderFunctionSingle() {
     if (update_screen) {
         update_screen = false;
-            window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
-            for (i in ob) {
-                window.ob[i].draw();
-            }        
+        window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
+        for (i in ob) {
+            window.ob[i].draw();
+        }
     }
 }
