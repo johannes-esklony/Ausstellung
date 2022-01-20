@@ -6,8 +6,13 @@ window.addEventListener("wheel", e=>{
       e.preventDefault();//prevent zoom
   });
 
-window.addEventListener("touchstart", touchHandler, false);
+window.addEventListener("touchstart", touchHandler);
 function touchHandler(event) {
+    if(event.touches.lenght > 1){
+        event.preventDefault();
+    }
+}
+window.ontouchmove = function (event) {
     if(event.touches.lenght > 1){
         event.preventDefault();
     }
