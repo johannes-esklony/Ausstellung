@@ -19,7 +19,7 @@ window.onload = function () {
     ob_urls = new Array();
     app = new App();
     //set update cycle
-    //setInterval(update, 1);
+    setInterval(update, 1);
 
     //get urls and load objects after
     get_urls();
@@ -94,7 +94,9 @@ class App_Object {
 
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
-
+        
+        this.scaledStandardWidth = 50;
+        this.scaledStandardHeight = 50;
     }
     getHeight(url, callback) {
         var img = new Image();
@@ -108,7 +110,7 @@ class App_Object {
     }
 
     draw() {
-        window.app.ctx.drawImage(this.img, this.x, this.y, 50, 50);
+        window.app.ctx.drawImage(this.img, this.x, this.y, this.scaledStandardWidth, this.scaledStandardHeight);
     }
     //Position is upper left corner
     setPosition(x, y) {
@@ -152,11 +154,58 @@ class App {
 
     //TODO: animate position
     app_update() {
+        
         update_screen=true;
     }
 };
 
 
+
+(function() {
+    document.onmousemove = handleMouseMove;
+    function handleMouseMove(event) {
+        var eventDoc, doc, body;
+
+        event = event || window.event; // IE-ism
+
+        // If pageX/Y aren't available and clientX/Y are,
+        // calculate pageX/Y - logic taken from jQuery.
+        // (This is to support old IE)
+        if (event.pageX == null && event.clientX != null) {
+            eventDoc = (event.target && event.target.ownerDocument) || document;
+            doc = eventDoc.documentElement;
+            body = eventDoc.body;
+
+            event.pageX = event.clientX +
+              (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+              (doc && doc.clientLeft || body && body.clientLeft || 0);
+            event.pageY = event.clientY +
+              (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
+              (doc && doc.clientTop  || body && body.clientTop  || 0 );
+        }
+
+        // Use event.pageX / event.pageY here
+        mouseX = event.pageX;
+        mouseY = event.pageY;
+    }
+})();
+
+
+
+(function() {
+    document.onclick = handleClick;
+    function handleClick(event) {
+        var x,y;
+        x = mouseX;
+        y = mouseY;
+        //check for object
+        for (i in ob){
+            if(x > ob[i].x && x < ob[i].x + ob[i].scaledStandardWidth && y > ob[i].y && y < ob[i].y + ob[i].scaledStandardHeight){
+                document.location = document.location.href.slice(0,-10) + ob[i].path;
+            }
+        }
+    }
+})();
 
 function renderFunction() {
     if (update_screen) {
