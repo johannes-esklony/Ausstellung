@@ -77,6 +77,7 @@ class App_Object {
         this.id = id;
         this.path = "img/" + path;
         this.img = new Image();
+        this.img.onload = requestAnimationFrame(renderFunctionSingle);
         this.img.src = this.path;
         var w_;
         this.getWidth(
@@ -132,6 +133,7 @@ class App {
         this.ctx = this.canvas.getContext("2d");
 
         this.bg = new Image();
+        this.bg.onload = requestAnimationFrame(renderFunctionSingle);
         this.bg.src = "room.jpg";
 
     }
@@ -216,4 +218,13 @@ function renderFunction() {
             }        
     }
     requestAnimationFrame(renderFunction);
+}
+function renderFunctionSingle() {
+    if (update_screen) {
+        update_screen = false;
+            window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
+            for (i in ob) {
+                window.ob[i].draw();
+            }        
+    }
 }
