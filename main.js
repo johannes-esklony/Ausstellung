@@ -180,7 +180,7 @@ class App {
 
     //TODO: animate position
     app_update() {
-
+        app.resize_canvas();
         update_screen = true;
         requestAnimationFrame(renderFunctionSingle);
     }
