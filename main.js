@@ -164,7 +164,7 @@ class App {
 
 
 
-        this.add_canvas();
+        this.resize_canvas();
         this.canvas = document.getElementById("main_canvas");
         this.ctx = this.canvas.getContext("2d");
 
@@ -172,13 +172,6 @@ class App {
         this.bg.onload = requestAnimationFrame(renderFunctionSingle);
         this.bg.src = "room.jpg";
 
-    }
-
-
-    add_canvas() {
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
-        $("#main_view").append("<canvas id='main_canvas' width=" + this.width + " height=" + this.height + "></canvas>");
     }
 
 
