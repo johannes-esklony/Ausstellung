@@ -14,17 +14,19 @@ document.body.style.overflow = "hidden";
 //load all (entrypoint)
 window.onload = function () {
     //initialize app and objects (to make them global)
+    update_screen = true;
     ob = new Array();
     ob_urls = new Array();
     app = new App();
-    //load objects
-    app.objects = load_objects();
     //set update cycle
     //setInterval(update, 1);
+
+    //get urls and load objects after
+    get_urls();
 }
 
 //http request requires to wait to load page and then to go on loading objects in load_objects2()
-function load_objects() {
+function get_urls() {
     //if on server
     if (window.location.href == "http://johannes-esklony.de/Ausstellung/") //TODO: change URL on deploy
     {
@@ -39,23 +41,23 @@ function load_objects() {
                     ob_urls.push(theText);
                     //$("body").prepend(theText);
                 }
-                load_objects2();
+                load_objects();
             }
         });
     }
     //if on local machine (due to missing(differently formatted) autoindex)
     else {
         ob_urls = ["1.png"];
-        load_objects2();
+        load_objects();
     }
 }
 
-function load_objects2() {
+function load_objects() {
     //fill array
     for (i in ob_urls) {
         ob.push(new App_Object(ob_urls[i], i));
     }
-    app.draw_objects();
+    requestAnimationFrame(renderFunction);
 }
 
 //relay to change scope from window to window.app
@@ -67,7 +69,7 @@ function update() {
 //window resize handling
 window.onresize = function () {
     app.resize_canvas();
-    app.draw_objects();
+    update_screen = true;
 }
 
 class App_Object {
@@ -76,14 +78,20 @@ class App_Object {
         this.path = "img/" + path;
         this.img = new Image();
         this.img.src = this.path;
-        this.width = this.getWidth(
+        var w_;
+        this.getWidth(
             this.path,
-            function (width) { window.ob[id].width = width; }
+            function (width) { w_ = width; }
         );
-        this.height = this.getHeight(
+        this.width = w_;
+
+        var h_;
+        this.getHeight(
             this.path,
-            function (height) { window.ob[id].height = height; }
+            function (height) { h_ = height; }
         );
+        this.height = h_;
+
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
 
@@ -100,13 +108,7 @@ class App_Object {
     }
 
     draw() {
-            window.app.ctx.drawImage(this.img, this.x, this.y, 50, 50);
-        
-            //create var in order to access it from onload function
-            var img_ = this.img;
-            var x_ = this.x;
-            var y_ = this.y;
-            this.img.onload = function () { window.app.ctx.drawImage(img_, x_, y_, 50, 50); }
+        window.app.ctx.drawImage(this.img, this.x, this.y, 50, 50);
     }
     //Position is upper left corner
     setPosition(x, y) {
@@ -118,8 +120,8 @@ class App_Object {
 
 class App {
     constructor() {
-        this.height = window.outerHeight;
-        this.width = window.outerWidth;
+        this.height = window.innerHeight;
+        this.width = window.innerWidth;
 
 
 
@@ -127,40 +129,42 @@ class App {
         this.canvas = document.getElementById("main_canvas");
         this.ctx = this.canvas.getContext("2d");
 
+        this.bg = new Image();
+        this.bg.src = "room.jpg";
+
     }
 
 
     add_canvas() {
-        this.height = window.outerHeight;
-        this.width = window.outerWidth;
+        this.height = window.innerHeight;
+        this.width = window.innerWidth;
         $("#main_view").append("<canvas id='main_canvas' width=" + this.width + " height=" + this.height + "></canvas>");
     }
 
 
 
     resize_canvas() {
-        this.height = window.outerHeight;
-        this.width = window.outerWidth;
+        this.height = window.innerHeight;
+        this.width = window.innerWidth;
         $("#main_canvas").attr({ width: `${this.width}`, height: `${this.height}` });
     }
     //----------------------------------------------------------------------------------------------------------------//needs window.app (use in app.onload)
 
     //TODO: animate position
     app_update() {
-        //$("body").prepend("<p>" + "update" + "</p>");
-        this.draw_objects();
-    }
-
-    //TODO: optimize for scale and array of objects, fix flickering
-    draw_objects() {
-        var bg = new Image();
-        bg.src = "room.jpg";
-        bg.onload = function () {
-            window.app.ctx.drawImage(bg, 0, 0, window.app.width, window.app.height);
-            for (i in ob) {
-                window.ob[i].draw();
-            }
-        }
-
+        update_screen=true;
     }
 };
+
+
+
+function renderFunction() {
+    if (update_screen) {
+        update_screen = false;
+            window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
+            for (i in ob) {
+                window.ob[i].draw();
+            }        
+    }
+    requestAnimationFrame(renderFunction);
+}
