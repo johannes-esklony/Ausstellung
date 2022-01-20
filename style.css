@@ -6,7 +6,8 @@
 canvas { 
     background: rgba(36, 31, 85, 0); 
     display: block; 
-    margin: 0 auto; }
+    margin: 0 auto;
+}
 
 body{
     background-color: #645c51;

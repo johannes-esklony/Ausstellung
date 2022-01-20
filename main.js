@@ -1,6 +1,11 @@
 
+zoom = 100;
+$('body').bind('touchmove', function(event) { event.preventDefault() });
 
-
+window.addEventListener("wheel", e=>{
+    if(e.ctrlKey)
+      e.preventDefault();//prevent zoom
+  });
 //!nginx config file:
 //location /Ausstellung/img/ {
 //    autoindex on;
@@ -79,40 +84,60 @@ class App_Object {
         this.img = new Image();
         this.img.onload = requestAnimationFrame(renderFunctionSingle);
         this.img.src = this.path;
-        var w_;
+        this.width;
         this.getWidth(
             this.path,
-            function (width) { w_ = width; }
+            function (width) { ob[id].width = width; }
         );
-        this.width = w_;
 
-        var h_;
+        
+        this.height;
         this.getHeight(
             this.path,
-            function (height) { h_ = height; }
+            function (height) { ob[id].height = height; }
         );
-        this.height = h_;
 
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
 
         this.scaledStandardWidth = 50;
         this.scaledStandardHeight = 50;
+
+        this.scale = .1;
+
+        this.rotation = 0;
     }
     getHeight(url, callback) {
         var img = new Image();
-        img.src = url;
         img.onload = function () { callback(this.height); }
+        img.src = url;
     }
     getWidth(url, callback) {
         var img = new Image();
-        img.src = url;
         img.onload = function () { callback(this.width); }
+        img.src = url;
     }
 
     draw() {
         window.app.ctx.drawImage(this.img, this.x, this.y, this.scaledStandardWidth, this.scaledStandardHeight);
     }
+
+    drawImageCentered(){
+        /*
+        window.app.ctx.setTransform(this.scale, 0, 0, this.scale, this.x + this.scaledStandardWidth / 2, this.y + this.scaledStandardHeight / 2); // sets scale and origin
+        window.app.ctx.rotate(this.rotation);
+        window.app.ctx.drawImage(this.img, -this.scaledStandardWidth / 2, -this.scaledStandardHeight / 2, this.scaledStandardWidth, this.scaledStandardHeight);*/
+
+        window.app.ctx.setTransform(this.scale, 0, 0, this.scale, this.x, this.y); // sets scale and origin
+        window.app.ctx.rotate(this.rotation);
+        window.app.ctx.drawImage(this.img, - (this.width / 2), - (this.height / 2));
+    } 
+
+    drawImageCustomCenter(image, x, y, cx, cy, scale, rotation){
+        window.app.ctx.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
+        window.app.ctx.rotate(rotation);
+        window.app.ctx.drawImage(image, -cx, -cy);
+    } 
     //Position is upper left corner
     setPosition(x, y) {
         this.x = x;
@@ -213,22 +238,27 @@ class App {
     }
 })();
 
-function renderFunction() {
-    if (update_screen) {
-        update_screen = false;
-        window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
-        for (i in ob) {
-            window.ob[i].draw();
-        }
+
+
+(function () {
+    window.on = handleClick;
+    function handleClick(event) {
+
     }
+})();
+
+function renderFunction() {
+    renderFunctionSingle();
+
     requestAnimationFrame(renderFunction);
 }
 function renderFunctionSingle() {
     if (update_screen) {
         update_screen = false;
+        window.app.ctx.setTransform(1,0,0,1,0,0);
         window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
         for (i in ob) {
-            window.ob[i].draw();
+            window.ob[i].drawImageCentered();
         }
     }
 }
