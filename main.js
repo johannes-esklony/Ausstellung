@@ -1,6 +1,5 @@
 
 zoom = 100;
-$('body').bind('touchmove', function(event) { event.preventDefault() });
 
 window.addEventListener("wheel", e=>{
     if(e.ctrlKey)
