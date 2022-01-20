@@ -8,7 +8,8 @@
 //    autoindex_format html;
 //    autoindex_localtime off;
 //  }
-
+window.onscroll = () => { window.scroll(0, 0); };
+document.body.style.overflow = "hidden";
 
 //load all (entrypoint)
 window.onload = function () {
