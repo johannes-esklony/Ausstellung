@@ -23,7 +23,7 @@ window.onload = function () {
     ob_urls = new Array();
     app = new App();
     //set update cycle
-    setInterval(update, 1);
+    setInterval(update, 10);
 
     //get urls and load objects after
     get_urls();
@@ -182,6 +182,7 @@ class App {
     app_update() {
 
         update_screen = true;
+        requestAnimationFrame(renderFunctionSingle);
     }
 };
 
