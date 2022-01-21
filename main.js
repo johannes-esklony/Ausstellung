@@ -1,22 +1,30 @@
 
-zoom = 100;
+zoom = 1.0;
+maxzoom = 0;
+minzoom = 1;
 
 window.addEventListener("wheel", e=>{
     if(e.ctrlKey)
       e.preventDefault();//prevent zoom
-  });
+  },{passive: false});
 
+window.onwheel = function (e) {
+    zoom -= Math.sqrt(e.deltaY * e.deltaY + e.deltaX * e.deltaX) * .01;
+}
+/*
 window.addEventListener("touchstart", touchHandler);
 function touchHandler(event) {
     if(event.touches.lenght > 1){
         event.preventDefault();
     }
-}
+}*/
+/*
 window.ontouchmove = function (event) {
     if(event.touches.lenght > 1){
         event.preventDefault();
     }
 }
+*/
 //!nginx config file:
 //location /Ausstellung/img/ {
 //    autoindex on;
@@ -185,9 +193,14 @@ class App {
 
     //TODO: animate position
     app_update() {
-        app.resize_canvas();
+        if (zoom<maxzoom){
+            zoom = maxzoom;
+        }
+        else if (zoom>minzoom){
+            zoom = minzoom;
+        }
         update_screen = true;
-        requestAnimationFrame(renderFunctionSingle);
+
     }
 };
 
