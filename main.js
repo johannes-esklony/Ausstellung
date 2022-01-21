@@ -13,6 +13,7 @@ window.onwheel = function (e) {
 
 
 window.addEventListener("touchmove", touchHandler, {passive: false});
+window.addEventListener("gesturechange", touchHandler, {passive: false});
 function touchHandler(event) {
     if(event.touches.lenght > 1){
         event.preventDefault();
