@@ -106,6 +106,7 @@ function update() {
 window.onresize = function () {
     app.resize_canvas();
     update_screen = true;
+    requestAnimationFrame(renderFunction);
 }
 
 class App_Object {
