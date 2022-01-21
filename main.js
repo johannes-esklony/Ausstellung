@@ -11,9 +11,14 @@ window.onwheel = function (e) {
     zoom -= Math.sqrt(e.deltaY * e.deltaY + e.deltaX * e.deltaX) * .01;
 }
 
-
+window.addEventListener("touchstart", touchHandler, {passive: false});
 window.addEventListener("touchmove", touchHandler, {passive: false});
+window.addEventListener("touchend", touchHandler, {passive: false});
+
+
+window.addEventListener("gesturestart", touchHandler, {passive: false});
 window.addEventListener("gesturechange", touchHandler, {passive: false});
+window.addEventListener("gestureend", touchHandler, {passive: false});
 function touchHandler(event) {
     if(event.touches.lenght > 1){
         event.preventDefault();
