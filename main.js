@@ -10,13 +10,14 @@ window.addEventListener("wheel", e=>{
 window.onwheel = function (e) {
     zoom -= Math.sqrt(e.deltaY * e.deltaY + e.deltaX * e.deltaX) * .01;
 }
-/*
-window.addEventListener("touchstart", touchHandler);
+
+
+window.addEventListener("touchmove", touchHandler, {passive: false});
 function touchHandler(event) {
     if(event.touches.lenght > 1){
         event.preventDefault();
     }
-}*/
+}
 /*
 window.ontouchmove = function (event) {
     if(event.touches.lenght > 1){
