@@ -1,14 +1,20 @@
 
 zoom = 1.0;
-maxzoom = 0;
+maxzoom = .1;
 minzoom = 1;
+scale = 1;
+mouseX = 0;
+mouseY = 0;
+
+cameraOffsetX = 0;
+cameraOffsetY = 0;
 
 window.addEventListener("wheel", e=>{
       e.preventDefault();//prevent zoom
   },{passive: false});
 
 window.onwheel = function (e) {
-    zoom -= Math.sqrt(e.deltaY * e.deltaY + e.deltaX * e.deltaX) * .01;
+    zoom += (e.deltaY + e.deltaY) * .001;
 }
 
 window.addEventListener("touchstart", touchHandler, {passive: false});
@@ -128,9 +134,7 @@ class App_Object {
         this.scaledStandardWidth = 50;
         this.scaledStandardHeight = 50;
 
-        this.scale = .1;
-
-        this.rotation = 0;
+        this.rotation = 0.1;
     }
     getHeight(url, callback) {
         var img = new Image();
@@ -148,14 +152,11 @@ class App_Object {
     }
 
     drawImageCentered(){
-        /*
-        window.app.ctx.setTransform(this.scale, 0, 0, this.scale, this.x + this.scaledStandardWidth / 2, this.y + this.scaledStandardHeight / 2); // sets scale and origin
+        window.app.ctx.setTransform(scale, 0, 0, scale, this.x * scale - cameraOffsetX, this.y * scale - cameraOffsetY); // sets scale and origin
         window.app.ctx.rotate(this.rotation);
-        window.app.ctx.drawImage(this.img, -this.scaledStandardWidth / 2, -this.scaledStandardHeight / 2, this.scaledStandardWidth, this.scaledStandardHeight);*/
+        window.app.ctx.drawImage(this.img,-(this.scaledStandardWidth / 2), - (this.scaledStandardHeight / 2), this.scaledStandardWidth, this.scaledStandardHeight);
+        window.app.ctx.setTransform(scale,0,0,scale,0-cameraOffsetX,0-cameraOffsetY);
 
-        window.app.ctx.setTransform(this.scale, 0, 0, this.scale, this.x, this.y); // sets scale and origin
-        window.app.ctx.rotate(this.rotation);
-        window.app.ctx.drawImage(this.img, - (this.width / 2), - (this.height / 2));
     } 
 
     drawImageCustomCenter(image, x, y, cx, cy, scale, rotation){
@@ -205,6 +206,10 @@ class App {
         else if (zoom>minzoom){
             zoom = minzoom;
         }
+        scale = 1/zoom;
+        //camera offset from 0 to scale * width/height - width/height
+        cameraOffsetX=(scale*this.width-this.width) * mouseX / this.width;
+        cameraOffsetY=(scale*this.height-this.height) * mouseY / this.height;
         update_screen = true;
 
     }
@@ -279,10 +284,13 @@ function renderFunction() {
 function renderFunctionSingle() {
     if (update_screen) {
         update_screen = false;
-        window.app.ctx.setTransform(1,0,0,1,0,0);
+        //window.app.ctx.setTransform(1,0,0,1,0,0);
+        window.app.ctx.setTransform(scale,0,0,scale,0-cameraOffsetX,0-cameraOffsetY);
+        app.ctx.clearRect(0,0,app.width,app.height);
         window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
         for (i in ob) {
             window.ob[i].drawImageCentered();
         }
+
     }
 }
