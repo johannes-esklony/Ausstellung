@@ -25,10 +25,13 @@ window.addEventListener("touchend", touchHandler, {passive: false});
 window.addEventListener("gesturestart", touchHandler, {passive: false});
 window.addEventListener("gesturechange", touchHandler, {passive: false});
 window.addEventListener("gestureend", touchHandler, {passive: false});
+
+
+
 function touchHandler(event) {
-    if(event.touches.lenght > 1){
+    //if(event.touches.lenght > 1){
         event.preventDefault();
-    }
+    //}
 }
 /*
 window.ontouchmove = function (event) {
@@ -103,11 +106,15 @@ function update() {
 
 //TODO: fix object position after scaling
 //window resize handling
-window.onresize = function () {
+window.onresize = handleResize;
+function handleResize() {
     app.resize_canvas();
     update_screen = true;
     requestAnimationFrame(renderFunction);
 }
+
+window.addEventListener("deviceorientation", handleResize, true);
+
 
 class App_Object {
     constructor(path, id) {
@@ -175,8 +182,8 @@ class App_Object {
 
 class App {
     constructor() {
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
+        this.height = window.outerHeight;
+        this.width = window.outerWidth;
 
 
 
@@ -193,8 +200,8 @@ class App {
 
 
     resize_canvas() {
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
+        this.height = window.outerHeight;
+        this.width = window.outerWidth;
         $("#main_canvas").attr({ width: `${this.width}`, height: `${this.height}` });
     }
     //----------------------------------------------------------------------------------------------------------------//needs window.app (use in app.onload)
