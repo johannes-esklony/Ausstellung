@@ -202,7 +202,11 @@ class App_Object {
     }
 
     checkClick(x_, y_) {
-        if (x_ > this.x - (this.scaledStandardWidth / 2) && x_ < this.x + (this.scaledStandardWidth / 2) && y_ > this.y - (this.scaledStandardHeight / 2) && y_ < this.y + (this.scaledStandardHeight / 2)) {
+        var adjustedx = scale * this.x;
+        var adjustedy = scale * this.y;
+        var adjustedcx = cameraOffsetX + x_;
+        var adjustedcy = cameraOffsetY + y_;
+        if (adjustedcx > adjustedx - ((this.scaledStandardWidth * scale )/ 2) && adjustedcx < adjustedx + ((this.scaledStandardWidth * scale )/ 2) && adjustedcy > adjustedy - ((this.scaledStandardHeight * scale) / 2) && adjustedcy < adjustedy + ((this.scaledStandardHeight * scale) / 2)) {
             var p = document.location.href;
             while (p.slice(-1) != "/") {
                 p = p.slice(0, -1);
