@@ -14,7 +14,7 @@ window.addEventListener("wheel", e=>{
   },{passive: false});
 
 window.onwheel = function (e) {
-    zoom += (e.deltaY + e.deltaY) * .001;
+    zoom -= (e.deltaY/(scale*scale)) * .001;
 }
 
 window.addEventListener("touchstart", touchHandler, {passive: false});
@@ -109,8 +109,16 @@ function update() {
 window.onresize = handleResize;
 function handleResize() {
     app.resize_canvas();
+
+    //adjust the object location
+    for(i in ob){
+        ob[i].resize();
+    }
+    window.app.lastheight = window.app.height;
+    window.app.lastwidth = window.app.width;
+
     update_screen = true;
-    requestAnimationFrame(renderFunction);
+    requestAnimationFrame(renderFunctionSingle);
 }
 
 window.addEventListener("deviceorientation", handleResize, true);
@@ -139,6 +147,8 @@ class App_Object {
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
 
+        
+
         this.scaledStandardWidth = 50;
         this.scaledStandardHeight = 50;
 
@@ -153,6 +163,21 @@ class App_Object {
         var img = new Image();
         img.onload = function () { callback(this.width); }
         img.src = url;
+    }
+
+    resize(){
+        this.x = this.x * (window.app.width/window.app.lastwidth);
+        this.y = this.y * (window.app.height/window.app.lastheight);
+    }
+
+    checkClick(x_,y_){
+        if (x_ > this.x - (this.scaledStandardWidth / 2) && x_ < this.x + (this.scaledStandardWidth / 2) && y_ > this.y - ( this.scaledStandardHeight / 2) && y_ < this.y + (this.scaledStandardHeight / 2)) {
+            var p = document.location.href;
+            while (p.slice(-1) != "/") {
+                p = p.slice(0,-1);
+            }
+            document.location = p + ob[i].path;
+        }
     }
 
     draw() {
@@ -172,7 +197,7 @@ class App_Object {
         window.app.ctx.rotate(rotation);
         window.app.ctx.drawImage(image, -cx, -cy);
     } 
-    //Position is upper left corner
+    //Position is center
     setPosition(x, y) {
         this.x = x;
         this.y = y;
@@ -182,10 +207,11 @@ class App_Object {
 
 class App {
     constructor() {
-        this.height = window.outerHeight;
-        this.width = window.outerWidth;
+        this.height = window.innerHeight;
+        this.width = window.innerWidth;
 
-
+        this.lastheight = this.height;
+        this.lastwidth = this.width;
 
         this.resize_canvas();
         this.canvas = document.getElementById("main_canvas");
@@ -200,8 +226,8 @@ class App {
 
 
     resize_canvas() {
-        this.height = window.outerHeight;
-        this.width = window.outerWidth;
+        this.height = window.innerHeight;
+        this.width = window.innerWidth;
         $("#main_canvas").attr({ width: `${this.width}`, height: `${this.height}` });
     }
     //----------------------------------------------------------------------------------------------------------------//needs window.app (use in app.onload)
@@ -218,6 +244,7 @@ class App {
         //camera offset from 0 to scale * width/height - width/height
         cameraOffsetX=(scale*this.width-this.width) * mouseX / this.width;
         cameraOffsetY=(scale*this.height-this.height) * mouseY / this.height;
+  
         update_screen = true;
 
     }
@@ -264,25 +291,12 @@ class App {
         y = mouseY;
         //check for object
         for (i in ob) {
-            if (x > ob[i].x && x < ob[i].x + ob[i].scaledStandardWidth && y > ob[i].y && y < ob[i].y + ob[i].scaledStandardHeight) {
-                var p = document.location.href;
-                while (p.slice(-1) != "/") {
-                    p = p.slice(0,-1);
-                }
-                document.location = p + ob[i].path;
-            }
+            ob[i].checkClick(x,y);
         }
     }
 })();
 
 
-
-(function () {
-    window.on = handleClick;
-    function handleClick(event) {
-
-    }
-})();
 
 function renderFunction() {
     renderFunctionSingle();
@@ -292,7 +306,6 @@ function renderFunction() {
 function renderFunctionSingle() {
     if (update_screen) {
         update_screen = false;
-        //window.app.ctx.setTransform(1,0,0,1,0,0);
         window.app.ctx.setTransform(scale,0,0,scale,0-cameraOffsetX,0-cameraOffsetY);
         app.ctx.clearRect(0,0,app.width,app.height);
         window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
