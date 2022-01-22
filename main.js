@@ -1,6 +1,6 @@
 
 zoom = 1.0;
-maxzoom = .1;
+maxzoom = .2;
 minzoom = 1;
 scale = 1;
 mouseX = 0;
@@ -15,15 +15,34 @@ window.addEventListener("wheel", e => {
 
 window.onwheel = handleZoom;
 function handleZoom(e) {
-    zoom -= (e.deltaY / (scale * scale)) * .001;
+    zoom -= (e.deltaY) * .001;
     if (zoom < maxzoom) {
         zoom = maxzoom;
     }
     else if (zoom > minzoom) {
         zoom = minzoom;
     }
+    var _x = (cameraOffsetX + mouseX) / (app.width * scale);
+    var _y = (cameraOffsetY + mouseY) / (app.height * scale);
     scale = 1 / zoom;
 
+    ///cameraoffset, scale
+
+    cameraOffsetX = _x * app.width * scale - mouseX; //scale, mousepos, windowwidth/// scale * windowwidth gesamtzahl der pixel //// mousex / appwidth: prozent,wohin gezoomt wird///
+    cameraOffsetY = _y * scale * app.height - mouseY;
+
+    ///
+
+    if (cameraOffsetX > scale * app.width - app.width) {
+        cameraOffsetX = scale * app.width - app.width
+    } else if (cameraOffsetX < 0) {
+        cameraOffsetX = 0;
+    }
+    if (cameraOffsetY > scale * app.height - app.height){
+        cameraOffsetY = scale * app.height - app.height
+    }else if (cameraOffsetY < 0){
+        cameraOffsetY = 0;
+    }
 
     update_screen = true;
 }
@@ -318,8 +337,20 @@ class App {
             _lastx = mouseX;
             _lasty = mouseY;
 
-            cameraOffsetX += deltaX;
-            cameraOffsetY += deltaY;
+            cameraOffsetX += deltaX * scale * .8;
+            cameraOffsetY += deltaY * scale * .8;
+
+            if (cameraOffsetX > scale * app.width - app.width) {
+                cameraOffsetX = scale * app.width - app.width
+            } else if (cameraOffsetX < 0) {
+                cameraOffsetX = 0;
+            }
+            if (cameraOffsetY > scale * app.height - app.height){
+                cameraOffsetY = scale * app.height - app.height
+            }else if (cameraOffsetY < 0){
+                cameraOffsetY = 0;
+            }
+
             update_screen = true;
             requestAnimationFrame(renderFunctionSingle);
 
@@ -341,7 +372,7 @@ function renderFunctionSingle() {
         update_screen = false;
         window.app.ctx.resetTransform();
         window.app.ctx.setTransform(scale, 0, 0, scale, 0 - cameraOffsetX, 0 - cameraOffsetY);
-        app.ctx.clearRect(0, 0, app.width, app.height);
+        window.app.ctx.clearRect(0, 0, app.width, app.height);
         window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
         for (i in ob) {
             window.ob[i].drawImageCentered();
