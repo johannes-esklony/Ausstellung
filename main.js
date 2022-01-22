@@ -9,28 +9,39 @@ mouseY = 0;
 cameraOffsetX = 0;
 cameraOffsetY = 0;
 
-window.addEventListener("wheel", e=>{
-      e.preventDefault();//prevent zoom
-  },{passive: false});
+window.addEventListener("wheel", e => {
+    e.preventDefault();//prevent zoom
+}, { passive: false });
 
-window.onwheel = function (e) {
-    zoom -= (e.deltaY/(scale*scale)) * .001;
+window.onwheel = handleZoom;
+function handleZoom(e) {
+    zoom -= (e.deltaY / (scale * scale)) * .001;
+    if (zoom < maxzoom) {
+        zoom = maxzoom;
+    }
+    else if (zoom > minzoom) {
+        zoom = minzoom;
+    }
+    scale = 1 / zoom;
+
+
+    update_screen = true;
 }
 
-window.addEventListener("touchstart", touchHandler, {passive: false});
-window.addEventListener("touchmove", touchHandler, {passive: false});
-window.addEventListener("touchend", touchHandler, {passive: false});
+window.addEventListener("touchstart", touchHandler, { passive: false });
+window.addEventListener("touchmove", touchHandler, { passive: false });
+window.addEventListener("touchend", touchHandler, { passive: false });
 
 
-window.addEventListener("gesturestart", touchHandler, {passive: false});
-window.addEventListener("gesturechange", touchHandler, {passive: false});
-window.addEventListener("gestureend", touchHandler, {passive: false});
+window.addEventListener("gesturestart", touchHandler, { passive: false });
+window.addEventListener("gesturechange", touchHandler, { passive: false });
+window.addEventListener("gestureend", touchHandler, { passive: false });
 
 
 
 function touchHandler(event) {
     //if(event.touches.lenght > 1){
-        event.preventDefault();
+    event.preventDefault();
     //}
 }
 /*
@@ -102,6 +113,7 @@ function load_objects() {
 //relay to change scope from window to window.app
 function update() {
     app.app_update();
+    requestAnimationFrame(renderFunctionSingle);
 }
 
 //TODO: fix object position after scaling
@@ -111,7 +123,7 @@ function handleResize() {
     app.resize_canvas();
 
     //adjust the object location
-    for(i in ob){
+    for (i in ob) {
         ob[i].resize();
     }
     window.app.lastheight = window.app.height;
@@ -137,7 +149,7 @@ class App_Object {
             function (width) { ob[id].width = width; }
         );
 
-        
+
         this.height;
         this.getHeight(
             this.path,
@@ -147,7 +159,7 @@ class App_Object {
         this.x = Math.floor(Math.random() * window.app.width);
         this.y = Math.floor(Math.random() * window.app.height);
 
-        
+
 
         this.scaledStandardWidth = 50;
         this.scaledStandardHeight = 50;
@@ -165,16 +177,16 @@ class App_Object {
         img.src = url;
     }
 
-    resize(){
-        this.x = this.x * (window.app.width/window.app.lastwidth);
-        this.y = this.y * (window.app.height/window.app.lastheight);
+    resize() {
+        this.x = this.x * (window.app.width / window.app.lastwidth);
+        this.y = this.y * (window.app.height / window.app.lastheight);
     }
 
-    checkClick(x_,y_){
-        if (x_ > this.x - (this.scaledStandardWidth / 2) && x_ < this.x + (this.scaledStandardWidth / 2) && y_ > this.y - ( this.scaledStandardHeight / 2) && y_ < this.y + (this.scaledStandardHeight / 2)) {
+    checkClick(x_, y_) {
+        if (x_ > this.x - (this.scaledStandardWidth / 2) && x_ < this.x + (this.scaledStandardWidth / 2) && y_ > this.y - (this.scaledStandardHeight / 2) && y_ < this.y + (this.scaledStandardHeight / 2)) {
             var p = document.location.href;
             while (p.slice(-1) != "/") {
-                p = p.slice(0,-1);
+                p = p.slice(0, -1);
             }
             document.location = p + ob[i].path;
         }
@@ -184,19 +196,20 @@ class App_Object {
         window.app.ctx.drawImage(this.img, this.x, this.y, this.scaledStandardWidth, this.scaledStandardHeight);
     }
 
-    drawImageCentered(){
+    drawImageCentered() {
         window.app.ctx.setTransform(scale, 0, 0, scale, this.x * scale - cameraOffsetX, this.y * scale - cameraOffsetY); // sets scale and origin
         window.app.ctx.rotate(this.rotation);
-        window.app.ctx.drawImage(this.img,-(this.scaledStandardWidth / 2), - (this.scaledStandardHeight / 2), this.scaledStandardWidth, this.scaledStandardHeight);
-        window.app.ctx.setTransform(scale,0,0,scale,0-cameraOffsetX,0-cameraOffsetY);
+        window.app.ctx.drawImage(this.img, -(this.scaledStandardWidth / 2), - (this.scaledStandardHeight / 2), this.scaledStandardWidth, this.scaledStandardHeight);
+        window.app.ctx.rotate(0);
+        window.app.ctx.setTransform(scale, 0, 0, scale, 0 - cameraOffsetX, 0 - cameraOffsetY);
 
-    } 
+    }
 
-    drawImageCustomCenter(image, x, y, cx, cy, scale, rotation){
+    drawImageCustomCenter(image, x, y, cx, cy, scale, rotation) {
         window.app.ctx.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
         window.app.ctx.rotate(rotation);
         window.app.ctx.drawImage(image, -cx, -cy);
-    } 
+    }
     //Position is center
     setPosition(x, y) {
         this.x = x;
@@ -234,18 +247,6 @@ class App {
 
     //TODO: animate position
     app_update() {
-        if (zoom<maxzoom){
-            zoom = maxzoom;
-        }
-        else if (zoom>minzoom){
-            zoom = minzoom;
-        }
-        scale = 1/zoom;
-        //camera offset from 0 to scale * width/height - width/height
-        cameraOffsetX=(scale*this.width-this.width) * mouseX / this.width;
-        cameraOffsetY=(scale*this.height-this.height) * mouseY / this.height;
-  
-        update_screen = true;
 
     }
 };
@@ -291,12 +292,44 @@ class App {
         y = mouseY;
         //check for object
         for (i in ob) {
-            ob[i].checkClick(x,y);
+            ob[i].checkClick(x, y);
         }
     }
 })();
+(function () {
+    var _lastx;
+    var _lasty;
+    var _firstcall = true;
+    var drag;
+    window.onmousedown = handleDrag;
+    function handleDrag(e) {
+        //camera offset from 0 to scale * width/height - width/height
+        /*    cameraOffsetX+=(scale*this.width-this.width) * e.deltaX;
+            cameraOffsetY+=(scale*this.height-this.height) * e.deltaY;*/
+        if (_firstcall) {
+            _firstcall = false;
+            _lastx = e.clientX;
+            _lasty = e.clientY;
+            drag = setInterval(handleDrag, 10);
+        }
+        else {
+            var deltaX = _lastx - mouseX;
+            var deltaY = _lasty - mouseY;
+            _lastx = mouseX;
+            _lasty = mouseY;
 
+            cameraOffsetX += deltaX;
+            cameraOffsetY += deltaY;
+            update_screen = true;
+            requestAnimationFrame(renderFunctionSingle);
 
+        }
+    }
+    window.onmouseup = function () {
+        clearInterval(drag);
+        _firstcall = true;
+    }
+})();
 
 function renderFunction() {
     renderFunctionSingle();
@@ -306,8 +339,9 @@ function renderFunction() {
 function renderFunctionSingle() {
     if (update_screen) {
         update_screen = false;
-        window.app.ctx.setTransform(scale,0,0,scale,0-cameraOffsetX,0-cameraOffsetY);
-        app.ctx.clearRect(0,0,app.width,app.height);
+        window.app.ctx.resetTransform();
+        window.app.ctx.setTransform(scale, 0, 0, scale, 0 - cameraOffsetX, 0 - cameraOffsetY);
+        app.ctx.clearRect(0, 0, app.width, app.height);
         window.app.ctx.drawImage(app.bg, 0, 0, window.app.width, window.app.height);
         for (i in ob) {
             window.ob[i].drawImageCentered();
