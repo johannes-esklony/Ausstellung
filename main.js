@@ -9,67 +9,134 @@ mouseY = 0;
 cameraOffsetX = 0;
 cameraOffsetY = 0;
 
-window.addEventListener("wheel", e => {
-    e.preventDefault();//prevent zoom
-}, { passive: false });
 
-window.onwheel = handleZoom;
-function handleZoom(e) {
-    zoom -= (e.deltaY) * .001;
-    if (zoom < maxzoom) {
-        zoom = maxzoom;
+(function () {
+    window.addEventListener("wheel", e => {
+        e.preventDefault();//prevent zoom
+    }, { passive: false });
+
+    window.onwheel = handleZoom;
+    function handleZoom(e) {
+        zoom -= (e.deltaY) * .001;
+        if (zoom < maxzoom) {
+            zoom = maxzoom;
+        }
+        else if (zoom > minzoom) {
+            zoom = minzoom;
+        }
+        var _x = (cameraOffsetX + mouseX) / (app.width * scale);
+        var _y = (cameraOffsetY + mouseY) / (app.height * scale);
+        scale = 1 / zoom;
+
+        ///cameraoffset, scale
+
+        cameraOffsetX = _x * app.width * scale - mouseX; //scale, mousepos, windowwidth/// scale * windowwidth gesamtzahl der pixel //// mousex / appwidth: prozent,wohin gezoomt wird///
+        cameraOffsetY = _y * scale * app.height - mouseY;
+
+        ///
+
+        if (cameraOffsetX > scale * app.width - app.width) {
+            cameraOffsetX = scale * app.width - app.width
+        } else if (cameraOffsetX < 0) {
+            cameraOffsetX = 0;
+        }
+        if (cameraOffsetY > scale * app.height - app.height) {
+            cameraOffsetY = scale * app.height - app.height
+        } else if (cameraOffsetY < 0) {
+            cameraOffsetY = 0;
+        }
+
+        update_screen = true;
     }
-    else if (zoom > minzoom) {
-        zoom = minzoom;
-    }
-    var _x = (cameraOffsetX + mouseX) / (app.width * scale);
-    var _y = (cameraOffsetY + mouseY) / (app.height * scale);
-    scale = 1 / zoom;
-
-    ///cameraoffset, scale
-
-    cameraOffsetX = _x * app.width * scale - mouseX; //scale, mousepos, windowwidth/// scale * windowwidth gesamtzahl der pixel //// mousex / appwidth: prozent,wohin gezoomt wird///
-    cameraOffsetY = _y * scale * app.height - mouseY;
-
-    ///
-
-    if (cameraOffsetX > scale * app.width - app.width) {
-        cameraOffsetX = scale * app.width - app.width
-    } else if (cameraOffsetX < 0) {
-        cameraOffsetX = 0;
-    }
-    if (cameraOffsetY > scale * app.height - app.height){
-        cameraOffsetY = scale * app.height - app.height
-    }else if (cameraOffsetY < 0){
-        cameraOffsetY = 0;
-    }
-
-    update_screen = true;
-}
-
-window.addEventListener("touchstart", touchHandler, { passive: false });
-window.addEventListener("touchmove", touchHandler, { passive: false });
-window.addEventListener("touchend", touchHandler, { passive: false });
+})();
 
 
-window.addEventListener("gesturestart", touchHandler, { passive: false });
-window.addEventListener("gesturechange", touchHandler, { passive: false });
-window.addEventListener("gestureend", touchHandler, { passive: false });
-
-
-
-function touchHandler(event) {
-    //if(event.touches.lenght > 1){
-    event.preventDefault();
-    //}
-}
-/*
-window.ontouchmove = function (event) {
-    if(event.touches.lenght > 1){
+(function () {
+    window.addEventListener("touchstart", touchstartHandler, { passive: false });
+    window.addEventListener("touchmove", touchHandler, { passive: false });
+    window.addEventListener("touchend", touchendHandler, { passive: false });
+    var _lastx1;
+    var _lasty1;
+    var _lastx2;
+    var _lasty2;
+    var _firstcall = true;
+    var moved = false;
+    function touchHandler(event) {
+        moved = true;
         event.preventDefault();
+        if (event.touches.length == 2) {
+            var deltaX1, deltaX2, deltaY1, deltaY2;
+            _lastx1 = event.touches.item(0).clientX;
+            _lasty1 = event.touches.item(0).clientY;
+
+            _lastx2 = event.touches.item(1).clientX;
+            _lasty2 = event.touches.item(1).clientY;
+
+            if (!_firstcall) {
+                deltaX1 = _lastx1 - event.touches.item(0).clientX;
+                deltaY1 = _lasty1 - event.touches.item(0).clientY;
+
+                deltaX2 = _lastx2 - event.touches.item(1).clientX;
+                deltaY2 = _lasty2 - event.touches.item(1).clientY;
+                _firstcall = false;
+                zoom -= Math.sqrt((deltaX1 - deltaX2) * (deltaX1 - deltaX2) + (deltaY1 - deltaY2) * (deltaY1 - deltaY2)) * .002;
+                update_screen = true;
+            }
+        }
+        else if(event.touches.length == 1){
+            if (_firstcall) {
+                _firstcall = false;
+                _lastx = event.touches.item(0).clientX;
+                _lasty = event.touches.item(0).clientY;
+            }
+            else {
+                var deltaX = _lastx - event.touches.item(0).clientX;
+                var deltaY = _lasty - event.touches.item(0).clientY;
+                _lastx = event.touches.item(0).clientX;
+                _lasty = event.touches.item(0).clientY;
+    
+                cameraOffsetX += deltaX * scale * .8;
+                cameraOffsetY += deltaY * scale * .8;
+
+                if (cameraOffsetX > scale * app.width - app.width) {
+                    cameraOffsetX = scale * app.width - app.width;
+                } else if (cameraOffsetX < 0) {
+                    cameraOffsetX = 0;
+                }
+                if (cameraOffsetY > scale * app.height - app.height) {
+                    cameraOffsetY = scale * app.height - app.height;
+                } else if (cameraOffsetY < 0) {
+                    cameraOffsetY = 0;
+                }
+
+                update_screen = true;
+            }
+        }
     }
-}
-*/
+
+    function touchendHandler(event) {
+        event.preventDefault();
+        if(!moved && event.changedTouches.length == 1){
+            var x, y;
+            x = event.changedTouches.item(0).clientX;
+            y = event.changedTouches.item(0).clientY;
+            //check for object
+            for (i in ob) {
+                ob[i].checkClick(x, y);
+            }
+        }
+        _firstcall = true;
+
+    }
+
+    function touchstartHandler(event) {
+        event.preventDefault();
+        moved = false;
+    }
+
+})();
+
+
 //!nginx config file:
 //location /Ausstellung/img/ {
 //    autoindex on;
@@ -206,7 +273,7 @@ class App_Object {
         var adjustedy = scale * this.y;
         var adjustedcx = cameraOffsetX + x_;
         var adjustedcy = cameraOffsetY + y_;
-        if (adjustedcx > adjustedx - ((this.scaledStandardWidth * scale )/ 2) && adjustedcx < adjustedx + ((this.scaledStandardWidth * scale )/ 2) && adjustedcy > adjustedy - ((this.scaledStandardHeight * scale) / 2) && adjustedcy < adjustedy + ((this.scaledStandardHeight * scale) / 2)) {
+        if (adjustedcx > adjustedx - ((this.scaledStandardWidth * scale) / 2) && adjustedcx < adjustedx + ((this.scaledStandardWidth * scale) / 2) && adjustedcy > adjustedy - ((this.scaledStandardHeight * scale) / 2) && adjustedcy < adjustedy + ((this.scaledStandardHeight * scale) / 2)) {
             var p = document.location.href;
             while (p.slice(-1) != "/") {
                 p = p.slice(0, -1);
@@ -345,13 +412,13 @@ class App {
             cameraOffsetY += deltaY * scale * .8;
 
             if (cameraOffsetX > scale * app.width - app.width) {
-                cameraOffsetX = scale * app.width - app.width
+                cameraOffsetX = scale * app.width - app.width;
             } else if (cameraOffsetX < 0) {
                 cameraOffsetX = 0;
             }
-            if (cameraOffsetY > scale * app.height - app.height){
-                cameraOffsetY = scale * app.height - app.height
-            }else if (cameraOffsetY < 0){
+            if (cameraOffsetY > scale * app.height - app.height) {
+                cameraOffsetY = scale * app.height - app.height;
+            } else if (cameraOffsetY < 0) {
                 cameraOffsetY = 0;
             }
 
