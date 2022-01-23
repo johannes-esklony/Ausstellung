@@ -69,17 +69,17 @@ cameraOffsetY = 0;
         if (event.touches.length == 2) {
             var deltaX1, deltaX2, deltaY1, deltaY2;
             var leftX, rightX, upperY, lowerY;
-            if(event.touches.item(0).clientX < event.touches.item(1).clientX){
+            if (event.touches.item(0).clientX < event.touches.item(1).clientX) {
                 leftX = event.touches.item(0).clientX;
                 rightX = event.touches.item(1).clientX;
-            }else{
+            } else {
                 rightX = event.touches.item(0).clientX;
                 leftX = event.touches.item(1).clientX;
             }
-            if(event.touches.item(0).clientY <  event.touches.item(1).clientY){
+            if (event.touches.item(0).clientY < event.touches.item(1).clientY) {
                 upperY = event.touches.item(0).clientY;
                 lowerY = event.touches.item(1).clientY;
-            }else{
+            } else {
                 lowerY = event.touches.item(0).clientY;
                 upperY = event.touches.item(1).clientY;
             }
@@ -97,7 +97,29 @@ cameraOffsetY = 0;
                 else if (zoom > minzoom) {
                     zoom = minzoom;
                 }
+
+                var midX, midY;
+                midX = leftX + ((rightX - leftX) / 2);
+                midY = upperY + ((lowerY -upperY) / 2);
+
+                var _x = (cameraOffsetX + midX) / (app.width * scale);
+                var _y = (cameraOffsetY + midY) / (app.height * scale);
                 scale = 1 / zoom;
+
+                cameraOffsetX = _x * app.width * scale - midX; //scale, mousepos, windowwidth/// scale * windowwidth gesamtzahl der pixel //// mousex / appwidth: prozent,wohin gezoomt wird///
+                cameraOffsetY = _y * scale * app.height - midY;
+                
+                if (cameraOffsetX > scale * app.width - app.width) {
+                    cameraOffsetX = scale * app.width - app.width
+                } else if (cameraOffsetX < 0) {
+                    cameraOffsetX = 0;
+                }
+                if (cameraOffsetY > scale * app.height - app.height) {
+                    cameraOffsetY = scale * app.height - app.height
+                } else if (cameraOffsetY < 0) {
+                    cameraOffsetY = 0;
+                }
+
                 update_screen = true;
             }
             _lastxleft = leftX;
