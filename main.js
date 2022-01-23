@@ -55,36 +55,61 @@ cameraOffsetY = 0;
     window.addEventListener("touchstart", touchstartHandler, { passive: false });
     window.addEventListener("touchmove", touchHandler, { passive: false });
     window.addEventListener("touchend", touchendHandler, { passive: false });
-    var _lastx1;
-    var _lasty1;
-    var _lastx2;
-    var _lasty2;
-    var _firstcall = true;
+    var _lastxleft;
+    var _lastxright;
+    var _lastyupper;
+    var _lastylower;
+    var _firstcalldrag = true;
+    var _firstcallzoom = true;
     var moved = false;
     function touchHandler(event) {
         moved = true;
         event.preventDefault();
-        if (event.touches.length == 2) {
+
+        if (event.changedTouches.length == 2) {
             var deltaX1, deltaX2, deltaY1, deltaY2;
-            _lastx1 = event.touches.item(0).clientX;
-            _lasty1 = event.touches.item(0).clientY;
+            var leftX, rightX, upperY, lowerY;
+            if(event.changedTouches.item(0).clientX < event.changedTouches.item(1).clientX){
+                leftX = event.changedTouches.item(0).clientX;
+                rightX = event.changedTouches.item(1).clientX;
+            }else{
+                rightX = event.changedTouches.item(0).clientX;
+                leftX = event.changedTouches.item(1).clientX;
+            }
+            if(event.changedTouches.item(0).clientY <  event.changedTouches.item(1).clientY){
+                upperY = event.changedTouches.item(0).clientY;
+                lowerY = event.changedTouches.item(1).clientY;
+            }else{
+                lowerY = event.changedTouches.item(0).clientY;
+                upperY = event.changedTouches.item(1).clientY;
+            }
 
-            _lastx2 = event.touches.item(1).clientX;
-            _lasty2 = event.touches.item(1).clientY;
+            if (!_firstcallzoom) {
+                deltaX1 = _lastxleft - leftX;
+                deltaY1 = _lastyupper - upperY;
 
-            if (!_firstcall) {
-                deltaX1 = _lastx1 - event.touches.item(0).clientX;
-                deltaY1 = _lasty1 - event.touches.item(0).clientY;
-
-                deltaX2 = _lastx2 - event.touches.item(1).clientX;
-                deltaY2 = _lasty2 - event.touches.item(1).clientY;
+                deltaX2 = _lastxright - rightX;
+                deltaY2 = _lastylower - lowerY;
                 _firstcall = false;
-                zoom -= Math.sqrt((deltaX1 - deltaX2) * (deltaX1 - deltaX2) + (deltaY1 - deltaY2) * (deltaY1 - deltaY2)) * .002;
+                zoom -= ((deltaX1 - deltaX2) + (deltaY1 - deltaY2)) * .002;
+                if (zoom < maxzoom) {
+                    zoom = maxzoom;
+                }
+                else if (zoom > minzoom) {
+                    zoom = minzoom;
+                }
+                scale = 1 / zoom;
                 update_screen = true;
             }
+            _lastxleft = leftX;
+            _lastyupper = upperY;
+
+            _lastxright = rightX;
+            _lastylower = lowerY;
+            _firstcallzoom = false;
         }
-        else if(event.touches.length == 1){
-            if (_firstcall) {
+        else if (event.touches.length == 1) {
+            if (_firstcalldrag) {
                 _firstcall = false;
                 _lastx = event.touches.item(0).clientX;
                 _lasty = event.touches.item(0).clientY;
@@ -94,7 +119,7 @@ cameraOffsetY = 0;
                 var deltaY = _lasty - event.touches.item(0).clientY;
                 _lastx = event.touches.item(0).clientX;
                 _lasty = event.touches.item(0).clientY;
-    
+
                 cameraOffsetX += deltaX * scale * .8;
                 cameraOffsetY += deltaY * scale * .8;
 
@@ -116,7 +141,9 @@ cameraOffsetY = 0;
 
     function touchendHandler(event) {
         event.preventDefault();
-        if(!moved && event.changedTouches.length == 1){
+        _firstcalldrag = true;
+        _firstcallzoom = true;
+        if (!moved && event.changedTouches.length == 1) {
             var x, y;
             x = event.changedTouches.item(0).clientX;
             y = event.changedTouches.item(0).clientY;
@@ -125,7 +152,6 @@ cameraOffsetY = 0;
                 ob[i].checkClick(x, y);
             }
         }
-        _firstcall = true;
 
     }
 
