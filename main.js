@@ -66,22 +66,22 @@ cameraOffsetY = 0;
         moved = true;
         event.preventDefault();
 
-        if (event.changedTouches.length == 2) {
+        if (event.touches.length == 2) {
             var deltaX1, deltaX2, deltaY1, deltaY2;
             var leftX, rightX, upperY, lowerY;
-            if(event.changedTouches.item(0).clientX < event.changedTouches.item(1).clientX){
-                leftX = event.changedTouches.item(0).clientX;
-                rightX = event.changedTouches.item(1).clientX;
+            if(event.touches.item(0).clientX < event.touches.item(1).clientX){
+                leftX = event.touches.item(0).clientX;
+                rightX = event.touches.item(1).clientX;
             }else{
-                rightX = event.changedTouches.item(0).clientX;
-                leftX = event.changedTouches.item(1).clientX;
+                rightX = event.touches.item(0).clientX;
+                leftX = event.touches.item(1).clientX;
             }
-            if(event.changedTouches.item(0).clientY <  event.changedTouches.item(1).clientY){
-                upperY = event.changedTouches.item(0).clientY;
-                lowerY = event.changedTouches.item(1).clientY;
+            if(event.touches.item(0).clientY <  event.touches.item(1).clientY){
+                upperY = event.touches.item(0).clientY;
+                lowerY = event.touches.item(1).clientY;
             }else{
-                lowerY = event.changedTouches.item(0).clientY;
-                upperY = event.changedTouches.item(1).clientY;
+                lowerY = event.touches.item(0).clientY;
+                upperY = event.touches.item(1).clientY;
             }
 
             if (!_firstcallzoom) {
@@ -90,7 +90,6 @@ cameraOffsetY = 0;
 
                 deltaX2 = _lastxright - rightX;
                 deltaY2 = _lastylower - lowerY;
-                _firstcall = false;
                 zoom -= ((deltaX1 - deltaX2) + (deltaY1 - deltaY2)) * .002;
                 if (zoom < maxzoom) {
                     zoom = maxzoom;
@@ -110,7 +109,7 @@ cameraOffsetY = 0;
         }
         else if (event.touches.length == 1) {
             if (_firstcalldrag) {
-                _firstcall = false;
+                _firstcalldrag = false;
                 _lastx = event.touches.item(0).clientX;
                 _lasty = event.touches.item(0).clientY;
             }
