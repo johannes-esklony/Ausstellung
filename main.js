@@ -30,7 +30,7 @@ cameraOffsetY = 0;
 
         ///cameraoffset, scale
 
-        cameraOffsetX = _x * app.width * scale - mouseX; //scale, mousepos, windowwidth/// scale * windowwidth gesamtzahl der pixel //// mousex / appwidth: prozent,wohin gezoomt wird///
+        cameraOffsetX = _x * app.width * scale - mouseX;
         cameraOffsetY = _y * scale * app.height - mouseY;
 
         ///
@@ -106,7 +106,7 @@ cameraOffsetY = 0;
                 var _y = (cameraOffsetY + midY) / (app.height * scale);
                 scale = 1 / zoom;
 
-                cameraOffsetX = _x * app.width * scale - midX; //scale, mousepos, windowwidth/// scale * windowwidth gesamtzahl der pixel //// mousex / appwidth: prozent,wohin gezoomt wird///
+                cameraOffsetX = _x * app.width * scale - midX;
                 cameraOffsetY = _y * scale * app.height - midY;
                 
                 if (cameraOffsetX > scale * app.width - app.width) {
@@ -210,7 +210,7 @@ window.onload = function () {
 
 //http request requires to wait to load page and then to go on loading objects in load_objects2()
 function get_urls() {
-    //if on server
+    //dynamic, if on server
     if (window.location.href == "http://johannes-esklony.de/Ausstellung/") //TODO: change URL on deploy
     {
         $.ajax({
@@ -228,7 +228,7 @@ function get_urls() {
             }
         });
     }
-    //if on local machine (due to missing(differently formatted) autoindex)
+    //static, if on local machine (due to missing(differently formatted) autoindex)
     else {
         ob_urls = ["1.png"];
         load_objects();
@@ -249,7 +249,6 @@ function update() {
     requestAnimationFrame(renderFunctionSingle);
 }
 
-//TODO: fix object position after scaling
 //window resize handling
 window.onresize = handleResize;
 function handleResize() {
@@ -422,36 +421,26 @@ class App {
 
 
 (function () {
-    document.onclick = handleClick;
-    function handleClick(event) {
-        var x, y;
-        x = mouseX;
-        y = mouseY;
-        //check for object
-        for (i in ob) {
-            ob[i].checkClick(x, y);
-        }
-    }
-})();
-(function () {
     var _lastx;
     var _lasty;
     var _firstcall = true;
     var drag;
+    var moved = false;
     window.onmousedown = handleDrag;
     function handleDrag(e) {
-        //camera offset from 0 to scale * width/height - width/height
-        /*    cameraOffsetX+=(scale*this.width-this.width) * e.deltaX;
-            cameraOffsetY+=(scale*this.height-this.height) * e.deltaY;*/
         if (_firstcall) {
+            moved = false;
             _firstcall = false;
             _lastx = e.clientX;
             _lasty = e.clientY;
-            drag = setInterval(handleDrag, 10);
+            drag = setInterval(handleDrag, 1);
         }
         else {
             var deltaX = _lastx - mouseX;
             var deltaY = _lasty - mouseY;
+            if(deltaX != 0 || deltaY != 0){
+                moved = true;
+            }
             _lastx = mouseX;
             _lasty = mouseY;
 
@@ -477,7 +466,17 @@ class App {
     window.onmouseup = function () {
         clearInterval(drag);
         _firstcall = true;
+        if (!moved){
+            var x, y;
+            x = mouseX;
+            y = mouseY;
+            //check for object
+            for (i in ob) {
+                ob[i].checkClick(x, y);
+            }
+        }
     }
+
 })();
 
 function renderFunction() {
