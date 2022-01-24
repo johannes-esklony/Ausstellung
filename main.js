@@ -273,7 +273,10 @@ class App_Object {
         this.id = id;
         this.path = "img/" + path;
         this.img = new Image();
-        this.img.onload = requestAnimationFrame(renderFunctionSingle);
+        this.img.onload = function (e){
+            update_screen = true;
+            requestAnimationFrame(renderFunctionSingle);
+        }
         this.img.src = this.path;
         this.width;
         this.getWidth(
@@ -367,7 +370,10 @@ class App {
         this.ctx = this.canvas.getContext("2d");
 
         this.bg = new Image();
-        this.bg.onload = requestAnimationFrame(renderFunctionSingle);
+        this.bg.onload = function (e){
+            update_screen = true;
+            requestAnimationFrame(renderFunctionSingle);
+        }
         this.bg.src = "room.jpg";
 
     }
