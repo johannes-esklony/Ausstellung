@@ -50,6 +50,96 @@ cameraOffsetY = 0;
     }
 })();
 
+(function () {
+    document.onmousemove = handleMouseMove;
+    function handleMouseMove(event) {
+        var eventDoc, doc, body;
+
+        event = event || window.event; // IE-ism
+
+        // If pageX/Y aren't available and clientX/Y are,
+        // calculate pageX/Y - logic taken from jQuery.
+        // (This is to support old IE)
+        if (event.pageX == null && event.clientX != null) {
+            eventDoc = (event.target && event.target.ownerDocument) || document;
+            doc = eventDoc.documentElement;
+            body = eventDoc.body;
+
+            event.pageX = event.clientX +
+                (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+                (doc && doc.clientLeft || body && body.clientLeft || 0);
+            event.pageY = event.clientY +
+                (doc && doc.scrollTop || body && body.scrollTop || 0) -
+                (doc && doc.clientTop || body && body.clientTop || 0);
+        }
+
+        // Use event.pageX / event.pageY here
+        mouseX = event.pageX;
+        mouseY = event.pageY;
+    }
+})();
+
+
+
+(function () {
+    var _lastx;
+    var _lasty;
+    var _firstcall = true;
+    var drag;
+    var moved = false;
+    window.onmousedown = handleDrag;
+    function handleDrag(e) {
+        if (_firstcall) {
+            moved = false;
+            _firstcall = false;
+            _lastx = e.clientX;
+            _lasty = e.clientY;
+            drag = setInterval(handleDrag, 1);
+        }
+        else {
+            var deltaX = _lastx - mouseX;
+            var deltaY = _lasty - mouseY;
+            if(deltaX != 0 || deltaY != 0){
+                moved = true;
+            }
+            _lastx = mouseX;
+            _lasty = mouseY;
+
+            cameraOffsetX += deltaX * scale * .8;
+            cameraOffsetY += deltaY * scale * .8;
+
+            if (cameraOffsetX > scale * app.width - app.width) {
+                cameraOffsetX = scale * app.width - app.width;
+            } else if (cameraOffsetX < 0) {
+                cameraOffsetX = 0;
+            }
+            if (cameraOffsetY > scale * app.height - app.height) {
+                cameraOffsetY = scale * app.height - app.height;
+            } else if (cameraOffsetY < 0) {
+                cameraOffsetY = 0;
+            }
+
+            update_screen = true;
+            requestAnimationFrame(renderFunctionSingle);
+
+        }
+    }
+    window.onmouseup = function () {
+        clearInterval(drag);
+        _firstcall = true;
+        if (!moved){
+            var x, y;
+            x = mouseX;
+            y = mouseY;
+            //check for object
+            for (i in ob) {
+                ob[i].checkClick(x, y);
+            }
+        }
+    }
+
+})();
+
 
 (function () {
     window.addEventListener("touchstart", touchstartHandler, { passive: false });
@@ -183,6 +273,8 @@ cameraOffsetY = 0;
 
 })();
 
+window.onscroll = () => { window.scroll(0, 0); };
+document.body.style.overflow = "hidden";
 
 //!nginx config file:
 //location /Ausstellung/img/ {
@@ -191,8 +283,6 @@ cameraOffsetY = 0;
 //    autoindex_format html;
 //    autoindex_localtime off;
 //  }
-window.onscroll = () => { window.scroll(0, 0); };
-document.body.style.overflow = "hidden";
 
 //load all (entrypoint)
 window.onload = function () {
@@ -395,95 +485,6 @@ class App {
 
 
 
-(function () {
-    document.onmousemove = handleMouseMove;
-    function handleMouseMove(event) {
-        var eventDoc, doc, body;
-
-        event = event || window.event; // IE-ism
-
-        // If pageX/Y aren't available and clientX/Y are,
-        // calculate pageX/Y - logic taken from jQuery.
-        // (This is to support old IE)
-        if (event.pageX == null && event.clientX != null) {
-            eventDoc = (event.target && event.target.ownerDocument) || document;
-            doc = eventDoc.documentElement;
-            body = eventDoc.body;
-
-            event.pageX = event.clientX +
-                (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
-                (doc && doc.clientLeft || body && body.clientLeft || 0);
-            event.pageY = event.clientY +
-                (doc && doc.scrollTop || body && body.scrollTop || 0) -
-                (doc && doc.clientTop || body && body.clientTop || 0);
-        }
-
-        // Use event.pageX / event.pageY here
-        mouseX = event.pageX;
-        mouseY = event.pageY;
-    }
-})();
-
-
-
-(function () {
-    var _lastx;
-    var _lasty;
-    var _firstcall = true;
-    var drag;
-    var moved = false;
-    window.onmousedown = handleDrag;
-    function handleDrag(e) {
-        if (_firstcall) {
-            moved = false;
-            _firstcall = false;
-            _lastx = e.clientX;
-            _lasty = e.clientY;
-            drag = setInterval(handleDrag, 1);
-        }
-        else {
-            var deltaX = _lastx - mouseX;
-            var deltaY = _lasty - mouseY;
-            if(deltaX != 0 || deltaY != 0){
-                moved = true;
-            }
-            _lastx = mouseX;
-            _lasty = mouseY;
-
-            cameraOffsetX += deltaX * scale * .8;
-            cameraOffsetY += deltaY * scale * .8;
-
-            if (cameraOffsetX > scale * app.width - app.width) {
-                cameraOffsetX = scale * app.width - app.width;
-            } else if (cameraOffsetX < 0) {
-                cameraOffsetX = 0;
-            }
-            if (cameraOffsetY > scale * app.height - app.height) {
-                cameraOffsetY = scale * app.height - app.height;
-            } else if (cameraOffsetY < 0) {
-                cameraOffsetY = 0;
-            }
-
-            update_screen = true;
-            requestAnimationFrame(renderFunctionSingle);
-
-        }
-    }
-    window.onmouseup = function () {
-        clearInterval(drag);
-        _firstcall = true;
-        if (!moved){
-            var x, y;
-            x = mouseX;
-            y = mouseY;
-            //check for object
-            for (i in ob) {
-                ob[i].checkClick(x, y);
-            }
-        }
-    }
-
-})();
 
 function renderFunction() {
     renderFunctionSingle();
